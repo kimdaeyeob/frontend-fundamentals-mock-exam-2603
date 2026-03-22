@@ -62,10 +62,6 @@ export function ReservationStatusPage() {
     return () => clearTimeout(timer);
   }, [message]);
 
-  // 날짜 변경 시 메시지 초기화
-  useEffect(() => {
-    setMessage(null);
-  }, [date]);
 
   const { data: rooms = [], isError: isRoomsError, refetch: refetchRooms } = useQuery(['rooms'], getRooms);
   const { data: reservations = [], isError: isReservationsError, refetch: refetchReservations } = useQuery(['reservations', date], () => getReservations(date), { enabled: !!date });
@@ -110,7 +106,7 @@ export function ReservationStatusPage() {
             type="date"
             value={date}
             min={formatDate(new Date())}
-            onChange={e => setDate(e.target.value)}
+            onChange={e => { setDate(e.target.value); setMessage(null); }}
             aria-label="날짜"
             css={css`
               box-sizing: border-box; font-size: 16px; font-weight: 500; line-height: 1.5; height: 48px;
