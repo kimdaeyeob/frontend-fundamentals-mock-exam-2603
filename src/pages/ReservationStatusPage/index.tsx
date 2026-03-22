@@ -67,8 +67,8 @@ export function ReservationStatusPage() {
     setMessage(null);
   }, [date]);
 
-  const { data: rooms = [] } = useQuery(['rooms'], getRooms);
-  const { data: reservations = [] } = useQuery(['reservations', date], () => getReservations(date), { enabled: !!date });
+  const { data: rooms = [], isError: isRoomsError, refetch: refetchRooms } = useQuery(['rooms'], getRooms);
+  const { data: reservations = [], isError: isReservationsError, refetch: refetchReservations } = useQuery(['reservations', date], () => getReservations(date), { enabled: !!date });
   const { data: myReservationList = [] } = useQuery(['myReservations'], getMyReservations);
 
   const cancelMutation = useMutation((id: string) => cancelReservation(id), {
@@ -132,6 +132,17 @@ export function ReservationStatusPage() {
           예약 현황
         </Text>
         <Spacing size={16} />
+
+        {(isRoomsError || isReservationsError) && (
+          <div css={css`padding: 24px 0; text-align: center; background: ${colors.grey50}; border-radius: 14px; display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 12px;`}>
+            <Text typography="t6" color={colors.grey500}>
+              예약 현황을 불러오지 못했습니다.
+            </Text>
+            <Button type="primary" style="weak" size="small" onClick={() => { refetchRooms(); refetchReservations(); }}>
+              다시 시도
+            </Button>
+          </div>
+        )}
 
         <div css={css`background: ${colors.grey50}; border-radius: 14px; padding: 16px;`}>
           {/* 시간 헤더 */}

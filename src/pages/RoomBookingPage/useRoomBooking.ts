@@ -47,7 +47,7 @@ export function useRoomBooking() {
   }, [date, startTime, endTime, attendees, equipment, preferredFloor, setSearchParams]);
 
   // ── 서버 데이터 ─────────────────────────────────────────────────────────────
-  const { data: rawRooms = [], isLoading: isLoadingRooms } = useQuery(['rooms'], getRooms);
+  const { data: rawRooms = [], isLoading: isLoadingRooms, isError: isRoomsError, refetch: refetchRooms } = useQuery(['rooms'], getRooms);
   const rooms = rawRooms as Room[];
 
   const { data: rawReservations = [] } = useQuery(
@@ -186,6 +186,8 @@ export function useRoomBooking() {
     isFilterComplete,
     validationError,
     isLoadingRooms,
+    isRoomsError,
+    refetchRooms,
     // 액션
     handleBook,
     handleFilterChange,

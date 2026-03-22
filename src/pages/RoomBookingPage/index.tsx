@@ -23,6 +23,8 @@ export function RoomBookingPage() {
     isFilterComplete,
     validationError,
     isLoadingRooms,
+    isRoomsError,
+    refetchRooms,
     handleBook,
     handleFilterChange,
     isBooking,
@@ -219,7 +221,16 @@ export function RoomBookingPage() {
           </div>
           <Spacing size={16} />
 
-          {isLoadingRooms ? (
+          {isRoomsError ? (
+            <div css={css`padding: 40px 0; text-align: center; background: ${colors.grey50}; border-radius: 14px; display: flex; flex-direction: column; align-items: center; gap: 12px;`}>
+              <Text typography="t6" color={colors.grey500}>
+                회의실 정보를 불러오지 못했습니다.
+              </Text>
+              <Button type="primary" style="weak" size="small" onClick={() => refetchRooms()}>
+                다시 시도
+              </Button>
+            </div>
+          ) : isLoadingRooms ? (
             <div css={css`padding: 40px 0; text-align: center; background: ${colors.grey50}; border-radius: 14px;`}>
               <Text typography="t6" color={colors.grey500}>
                 조회 중...
