@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Top, Spacing, Border, Button, Text, Select, ListRow } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
 import { useRoomBooking } from './useRoomBooking';
-import { EQUIPMENT_LABELS, ALL_EQUIPMENT, formatDate } from './utils';
+import { EQUIPMENT_LABELS, ALL_EQUIPMENT, TIME_SLOTS, formatDate } from './utils';
 
 export function RoomBookingPage() {
   const navigate = useNavigate();
@@ -18,8 +18,6 @@ export function RoomBookingPage() {
     errorMessage,
     floors,
     availableRooms,
-    availableStartTimes,
-    availableEndTimes,
     isFilterComplete,
     validationError,
     isLoadingRooms,
@@ -101,7 +99,7 @@ export function RoomBookingPage() {
               aria-label="시작 시간"
             >
               <option value="">선택</option>
-              {availableStartTimes.map(t => (
+              {TIME_SLOTS.slice(0, -1).map(t => (
                 <option key={t} value={t}>{t}</option>
               ))}
             </Select>
@@ -114,7 +112,7 @@ export function RoomBookingPage() {
               aria-label="종료 시간"
             >
               <option value="">선택</option>
-              {availableEndTimes.map(t => (
+              {TIME_SLOTS.slice(1).map(t => (
                 <option key={t} value={t}>{t}</option>
               ))}
             </Select>
