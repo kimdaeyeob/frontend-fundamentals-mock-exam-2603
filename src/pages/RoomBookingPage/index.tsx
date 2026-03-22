@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Top, Spacing, Border, Button, Text, Select, ListRow } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
 import { useRoomBooking } from './useRoomBooking';
-import { EQUIPMENT_LABELS, ALL_EQUIPMENT, TIME_SLOTS, formatDate } from './utils';
+import { EQUIPMENT_LABELS, ALL_EQUIPMENT, formatDate } from './utils';
 
 export function RoomBookingPage() {
   const navigate = useNavigate();
@@ -18,8 +18,11 @@ export function RoomBookingPage() {
     errorMessage,
     floors,
     availableRooms,
+    availableStartTimes,
+    availableEndTimes,
     isFilterComplete,
     validationError,
+    isLoadingRooms,
     handleBook,
     handleFilterChange,
     isBooking,
@@ -96,7 +99,7 @@ export function RoomBookingPage() {
               aria-label="시작 시간"
             >
               <option value="">선택</option>
-              {TIME_SLOTS.slice(0, -1).map(t => (
+              {availableStartTimes.map(t => (
                 <option key={t} value={t}>{t}</option>
               ))}
             </Select>
@@ -109,7 +112,7 @@ export function RoomBookingPage() {
               aria-label="종료 시간"
             >
               <option value="">선택</option>
-              {TIME_SLOTS.slice(1).map(t => (
+              {availableEndTimes.map(t => (
                 <option key={t} value={t}>{t}</option>
               ))}
             </Select>
@@ -208,13 +211,21 @@ export function RoomBookingPage() {
             <Text typography="t5" fontWeight="bold" color={colors.grey900}>
               예약 가능 회의실
             </Text>
-            <Text typography="t7" fontWeight="medium" color={colors.grey500}>
-              {availableRooms.length}개
-            </Text>
+            {!isLoadingRooms && (
+              <Text typography="t7" fontWeight="medium" color={colors.grey500}>
+                {availableRooms.length}개
+              </Text>
+            )}
           </div>
           <Spacing size={16} />
 
-          {availableRooms.length === 0 ? (
+          {isLoadingRooms ? (
+            <div css={css`padding: 40px 0; text-align: center; background: ${colors.grey50}; border-radius: 14px;`}>
+              <Text typography="t6" color={colors.grey500}>
+                조회 중...
+              </Text>
+            </div>
+          ) : availableRooms.length === 0 ? (
             <div css={css`padding: 40px 0; text-align: center; background: ${colors.grey50}; border-radius: 14px;`}>
               <Text typography="t6" color={colors.grey500}>
                 조건에 맞는 회의실이 없습니다.

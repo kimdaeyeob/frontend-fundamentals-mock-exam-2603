@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { getRooms, getReservations, createReservation } from 'pages/remotes';
-import { formatDate, validateBookingTime, filterAvailableRooms } from './utils';
+import { formatDate, validateBookingTime, filterAvailableRooms, TIME_SLOTS } from './utils';
 import type { Room, Reservation, BookingPayload } from './types';
 
 export function useRoomBooking() {
@@ -47,7 +47,7 @@ export function useRoomBooking() {
   }, [date, startTime, endTime, attendees, equipment, preferredFloor, setSearchParams]);
 
   // ── 서버 데이터 ─────────────────────────────────────────────────────────────
-  const { data: rawRooms = [] } = useQuery(['rooms'], getRooms);
+  const { data: rawRooms = [], isLoading: isLoadingRooms } = useQuery(['rooms'], getRooms);
   const rooms = rawRooms as Room[];
 
   const { data: rawReservations = [] } = useQuery(
@@ -75,6 +75,25 @@ export function useRoomBooking() {
 
   const hasTimeInputs = startTime !== '' && endTime !== '';
   const isFilterComplete = hasTimeInputs && !validationError;
+
+  // 오늘 날짜 선택 시 현재 시간 이전 슬롯 제외
+  const availableStartTimes = useMemo(() => {
+    const slots = TIME_SLOTS.slice(0, -1);
+    const today = formatDate(new Date());
+    if (date !== today) return slots;
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    return slots.filter(slot => {
+      const [h, m] = slot.split(':').map(Number);
+      return h * 60 + m > currentMinutes;
+    });
+  }, [date]);
+
+  // startTime 이후 슬롯만 종료 시간에 노출
+  const availableEndTimes = useMemo(
+    () => TIME_SLOTS.slice(1).filter(t => !startTime || t > startTime),
+    [startTime]
+  );
 
   const floors = useMemo(
     () => Array.from(new Set(rooms.map(r => r.floor))).sort((a, b) => a - b),
@@ -162,8 +181,11 @@ export function useRoomBooking() {
     // 서버 derived
     floors,
     availableRooms,
+    availableStartTimes,
+    availableEndTimes,
     isFilterComplete,
     validationError,
+    isLoadingRooms,
     // 액션
     handleBook,
     handleFilterChange,
