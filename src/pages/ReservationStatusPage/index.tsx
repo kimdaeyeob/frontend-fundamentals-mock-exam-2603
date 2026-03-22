@@ -55,6 +55,18 @@ export function ReservationStatusPage() {
     }
   }, [locationState]);
 
+  // 메시지 배너 자동 제거 (5초 후)
+  useEffect(() => {
+    if (!message) return;
+    const timer = setTimeout(() => setMessage(null), 5000);
+    return () => clearTimeout(timer);
+  }, [message]);
+
+  // 날짜 변경 시 메시지 초기화
+  useEffect(() => {
+    setMessage(null);
+  }, [date]);
+
   const { data: rooms = [] } = useQuery(['rooms'], getRooms);
   const { data: reservations = [] } = useQuery(['reservations', date], () => getReservations(date), { enabled: !!date });
   const { data: myReservationList = [] } = useQuery(['myReservations'], getMyReservations);
